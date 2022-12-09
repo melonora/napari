@@ -220,11 +220,16 @@ class QtViewer(QSplitter):
 
         # This dictionary holds the corresponding vispy visual for each layer
         self.layer_to_visual = {}
-
+        # self.canvas = VispyCanvas(keys=None,
+        #    vsync=True,
+        #    parent=self,
+        #    size=self.viewer._canvas_size[::-1])
         self._create_canvas()
 
         # Stacked widget to provide a welcome page
-        self._canvas_overlay = QtWidgetOverlay(self, self.canvas.native)
+        self._canvas_overlay = QtWidgetOverlay(
+            self, self.canvas.scene_canvas.native
+        )
         self._canvas_overlay.set_welcome_visible(show_welcome_screen)
         self._canvas_overlay.sig_dropped.connect(self.dropEvent)
         self._canvas_overlay.leave.connect(self._leave_canvas)
@@ -263,11 +268,13 @@ class QtViewer(QSplitter):
 
         self.setAcceptDrops(True)
 
-        self.view = self.canvas.central_widget.add_view(border_width=0)
+        self.view = self.canvas.scene_canvas.central_widget.add_view(
+            border_width=0
+        )
         self.camera = VispyCamera(
             self.view, self.viewer.camera, self.viewer.dims
         )
-        self.canvas.events.draw.connect(self.camera.on_draw)
+        self.canvas.scene_canvas.events.draw.connect(self.camera.on_draw)
 
         # Add axes, scale bar
         self._add_visuals()
@@ -413,24 +420,30 @@ class QtViewer(QSplitter):
             parent=self,
             size=self.viewer._canvas_size[::-1],
         )
-        self.canvas.events.draw.connect(self.dims.enable_play)
+        self.canvas.scene_canvas.events.draw.connect(self.dims.enable_play)
 
-        self.canvas.events.mouse_double_click.connect(
+        self.canvas.scene_canvas.events.mouse_double_click.connect(
             self.on_mouse_double_click
         )
-        self.canvas.events.mouse_move.connect(self.on_mouse_move)
-        self.canvas.events.mouse_press.connect(self.on_mouse_press)
-        self.canvas.events.mouse_release.connect(self.on_mouse_release)
-        self.canvas.events.key_press.connect(
+        self.canvas.scene_canvas.events.mouse_move.connect(self.on_mouse_move)
+        self.canvas.scene_canvas.events.mouse_press.connect(
+            self.on_mouse_press
+        )
+        self.canvas.scene_canvas.events.mouse_release.connect(
+            self.on_mouse_release
+        )
+        self.canvas.scene_canvas.events.key_press.connect(
             self._key_map_handler.on_key_press
         )
-        self.canvas.events.key_release.connect(
+        self.canvas.scene_canvas.events.key_release.connect(
             self._key_map_handler.on_key_release
         )
-        self.canvas.events.mouse_wheel.connect(self.on_mouse_wheel)
-        self.canvas.events.draw.connect(self.on_draw)
-        self.canvas.events.resize.connect(self.on_resize)
-        self.canvas.bgcolor = transform_color(
+        self.canvas.scene_canvas.events.mouse_wheel.connect(
+            self.on_mouse_wheel
+        )
+        self.canvas.scene_canvas.events.draw.connect(self.on_draw)
+        self.canvas.scene_canvas.events.resize.connect(self.on_resize)
+        self.canvas.scene_canvas.bgcolor = transform_color(
             get_theme(self.viewer.theme, False).canvas.as_hex()
         )[0]
         theme = self.viewer.events.theme
@@ -455,14 +468,17 @@ class QtViewer(QSplitter):
             overlay=self.viewer.scale_bar,
             viewer=self.viewer,
             parent=self.view,
+            canvas=self.canvas,
         )
-        self.canvas.events.resize.connect(self.scale_bar._on_position_change)
+        self.canvas.scene_canvas.events.resize.connect(
+            self.scale_bar._on_position_change
+        )
         self.text_overlay = VispyTextOverlay(
             overlay=self.viewer.text_overlay,
             viewer=self.viewer,
             parent=self.view,
         )
-        self.canvas.events.resize.connect(
+        self.canvas.scene_canvas.events.resize.connect(
             self.text_overlay._on_position_change
         )
         self.interaction_box_visual = VispyInteractionBox(
@@ -588,8 +604,8 @@ class QtViewer(QSplitter):
         for i, layer in enumerate(self.viewer.layers):
             vispy_layer = self.layer_to_visual[layer]
             vispy_layer.order = i
-        self.canvas._draw_order.clear()
-        self.canvas.update()
+        self.canvas.scene_canvas._draw_order.clear()
+        self.canvas.scene_canvas.update()
 
     def _save_layers_dialog(self, selected=False):
         """Save layers (all or selected) to disk, using ``LayerList.save()``.
@@ -895,7 +911,7 @@ class QtViewer(QSplitter):
         else:
             q_cursor = self._cursors[cursor]
 
-        self.canvas.native.setCursor(q_cursor)
+        self.canvas.scene_canvas.native.setCursor(q_cursor)
 
     def toggle_console_visibility(self, event=None):
         """Toggle console visible and not visible.
@@ -968,7 +984,7 @@ class QtViewer(QSplitter):
         """
         # Find corners of canvas in world coordinates
         top_left = self._map_canvas2world([0, 0])
-        bottom_right = self._map_canvas2world(self.canvas.size)
+        bottom_right = self._map_canvas2world(self.canvas.scene_canvas.size)
         return np.array([top_left, bottom_right])
 
     def on_resize(self, event):
@@ -977,7 +993,7 @@ class QtViewer(QSplitter):
         event : vispy.util.event.Event
             The vispy event that triggered this method.
         """
-        self.viewer._canvas_size = tuple(self.canvas.size[::-1])
+        self.viewer._canvas_size = tuple(self.canvas.scene_canvas.size[::-1])
 
     def _process_mouse_event(self, mouse_callbacks, event):
         """Add properties to the mouse event before passing the event to the
@@ -1121,7 +1137,7 @@ class QtViewer(QSplitter):
                 corner_pixels_displayed=canvas_corners_world[
                     :, displayed_axes
                 ],
-                shape_threshold=self.canvas.size,
+                shape_threshold=self.canvas.scene_canvas.size,
             )
 
     def set_welcome_visible(self, visible):

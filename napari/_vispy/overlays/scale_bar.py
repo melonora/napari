@@ -16,7 +16,8 @@ class VispyScaleBarOverlay(VispyCanvasOverlay):
         self._target_length = 150
         self._scale = 1
         self._unit = None
-
+        self.canvas = kwargs['canvas']
+        kwargs.pop("canvas")
         super().__init__(node=ScaleBar(), **kwargs)
         self.x_size = 150  # will be updated on zoom anyways
         # need to change from defaults because the anchor is in the center
@@ -120,9 +121,9 @@ class VispyScaleBarOverlay(VispyCanvasOverlay):
                 # set scale color negative of theme background.
                 # the reason for using the `as_hex` here is to avoid
                 # `UserWarning` which is emitted when RGB values are above 1
-                if self.node.parent.parent.canvas.background_color_override:
+                if self.canvas.background_color_override:
                     background_color = transform_color(
-                        self.node.parent.parent.canvas.background_color_override
+                        self.canvas.background_color_override
                     )[0]
                 else:
                     background_color = get_theme(
