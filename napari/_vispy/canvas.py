@@ -30,6 +30,8 @@ class VispyCanvas:
         self.max_texture_sizes = None
         self._last_theme_color = None
         self._background_color_override = None
+        self.viewer = kwargs["parent"].viewer
+        self.napari_canvas = kwargs["parent"].viewer.canvas
         self.scene_canvas = SceneCanvas(*args, **kwargs)
         self._instances.add(self)
 
