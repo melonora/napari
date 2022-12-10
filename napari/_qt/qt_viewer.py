@@ -220,11 +220,13 @@ class QtViewer(QSplitter):
 
         # This dictionary holds the corresponding vispy visual for each layer
         self.layer_to_visual = {}
-        # self.canvas = VispyCanvas(keys=None,
-        #    vsync=True,
-        #    parent=self,
-        #    size=self.viewer._canvas_size[::-1])
-        self._create_canvas()
+        self.canvas = VispyCanvas(
+            keys=None,
+            vsync=True,
+            parent=self,
+            size=self.viewer._canvas_size[::-1],
+        )
+        # self._create_canvas()
 
         # Stacked widget to provide a welcome page
         self._canvas_overlay = QtWidgetOverlay(
@@ -1153,7 +1155,9 @@ class QtViewer(QSplitter):
         event : qtpy.QtCore.QEvent
             Event from the Qt context.
         """
-        self.canvas._backend._keyEvent(self.canvas.events.key_press, event)
+        self.canvas.scene_canvas._backend._keyEvent(
+            self.canvas.scene_canvas.events.key_press, event
+        )
         event.accept()
 
     def keyReleaseEvent(self, event):
@@ -1164,7 +1168,9 @@ class QtViewer(QSplitter):
         event : qtpy.QtCore.QEvent
             Event from the Qt context.
         """
-        self.canvas._backend._keyEvent(self.canvas.events.key_release, event)
+        self.canvas.scene_canvas._backend._keyEvent(
+            self.canvas.scene_canvas.events.key_release, event
+        )
         event.accept()
 
     def dragEnterEvent(self, event):
