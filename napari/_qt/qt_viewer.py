@@ -224,7 +224,7 @@ class QtViewer(QSplitter):
             keys=None,
             vsync=True,
             parent=self,
-            size=self.viewer._canvas_size[::-1],
+            size=self.viewer.canvas.size[::-1],
         )
         # self._create_canvas()
 
@@ -395,11 +395,15 @@ class QtViewer(QSplitter):
 
     def _leave_canvas(self):
         """disable status on canvas leave"""
+        # self.viewer.canvas.status = ""
+        # self.viewer.canvas.mouse_over_canvas = False
         self.viewer.status = ""
         self.viewer.mouse_over_canvas = False
 
     def _enter_canvas(self):
         """enable status on canvas enter"""
+        # self.viewer.canvas.status = "Ready"
+        # self.viewer.canvas.mouse_over_canvas = True
         self.viewer.status = "Ready"
         self.viewer.mouse_over_canvas = True
 
@@ -1193,7 +1197,7 @@ class QtViewer(QSplitter):
 
     def _set_drag_status(self):
         """Set dedicated status message when dragging files into viewer"""
-        self.viewer.status = trans._(
+        self.viewer.canvas.status = trans._(
             'Hold <Alt> key to open plugin selection. Hold <Shift> to open files as stack.'
         )
 
