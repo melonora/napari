@@ -15,7 +15,6 @@ from typing import (
     Optional,
     Sequence,
     Set,
-    Tuple,
     Union,
 )
 
@@ -145,7 +144,7 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
     title: str = 'napari'
 
     # 2-tuple indicating height and width
-    _canvas_size: Tuple[int, int] = (600, 800)
+    # _canvas_size: Tuple[int, int] = (600, 800)
     _ctx: Mapping
     # To check if mouse is over canvas to avoid race conditions between
     # different events systems
@@ -312,12 +311,12 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
         # The default value used below will zoom such that the whole field
         # of view will occupy 95% of the canvas on the most filled axis
         if np.max(size) == 0:
-            self.camera.zoom = 0.95 * np.min(self._canvas_size)
+            self.camera.zoom = 0.95 * np.min(self.canvas.size)
         else:
             scale = np.array(size[-2:])
             scale[np.isclose(scale, 0)] = 1
             self.camera.zoom = 0.95 * np.min(
-                np.array(self._canvas_size) / scale
+                np.array(self.canvas.size) / scale
             )
         self.camera.angles = (0, 0, 90)
 

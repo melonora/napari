@@ -906,7 +906,7 @@ class QtViewer(QSplitter):
             size = int(size)
 
             # make sure the square fits within the current canvas
-            if size < 8 or size > (min(*self.canvas.size) - 4):
+            if size < 8 or size > (min(*self.viewer.canvas.size) - 4):
                 q_cursor = self._cursors['cross']
             elif cursor == 'circle':
                 q_cursor = QCursor(circle_pixmap(size))
@@ -990,7 +990,7 @@ class QtViewer(QSplitter):
         """
         # Find corners of canvas in world coordinates
         top_left = self._map_canvas2world([0, 0])
-        bottom_right = self._map_canvas2world(self.canvas.scene_canvas.size)
+        bottom_right = self._map_canvas2world(self.viewer.canvas.size)
         return np.array([top_left, bottom_right])
 
     def on_resize(self, event):
@@ -999,7 +999,7 @@ class QtViewer(QSplitter):
         event : vispy.util.event.Event
             The vispy event that triggered this method.
         """
-        self.viewer._canvas_size = tuple(self.canvas.scene_canvas.size[::-1])
+        self.viewer.canvas.size = tuple(self.canvas.scene_canvas.size[::-1])
 
     def _process_mouse_event(self, mouse_callbacks, event):
         """Add properties to the mouse event before passing the event to the
