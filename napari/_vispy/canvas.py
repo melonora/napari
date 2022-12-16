@@ -87,7 +87,7 @@ class VispyCanvas:
         """Overrides SceneCanvas.central_widget to make border_width=0"""
         if self.scene_canvas._central_widget is None:
             self.scene_canvas._central_widget = Widget(
-                size=self.scene_canvas.size,
+                size=self.napari_canvas.size[::-1],
                 parent=self.scene_canvas.scene,
                 border_width=0,
             )
@@ -97,4 +97,4 @@ class VispyCanvas:
         """Ignore mouse wheel events which have modifiers."""
         if event.type == 'mouse_wheel' and len(event.modifiers) > 0:
             return
-        super()._process_mouse_event(event)
+        self.scene_canvas._process_mouse_event(event)
