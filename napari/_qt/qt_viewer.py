@@ -228,6 +228,39 @@ class QtViewer(QSplitter):
         )
         # self._create_canvas()
 
+        self.canvas.scene_canvas.events.draw.connect(self.dims.enable_play)
+
+        self.canvas.scene_canvas.events.mouse_double_click.connect(
+            self.on_mouse_double_click
+        )
+        self.canvas.scene_canvas.events.mouse_move.connect(self.on_mouse_move)
+        self.canvas.scene_canvas.events.mouse_press.connect(
+            self.on_mouse_press
+        )
+        self.canvas.scene_canvas.events.mouse_release.connect(
+            self.on_mouse_release
+        )
+        self.canvas.scene_canvas.events.key_press.connect(
+            self._key_map_handler.on_key_press
+        )
+        self.canvas.scene_canvas.events.key_release.connect(
+            self._key_map_handler.on_key_release
+        )
+        self.canvas.scene_canvas.events.mouse_wheel.connect(
+            self.on_mouse_wheel
+        )
+        self.canvas.scene_canvas.events.draw.connect(self.on_draw)
+        self.canvas.scene_canvas.events.resize.connect(self.on_resize)
+        self.canvas.scene_canvas.bgcolor = transform_color(
+            get_theme(self.viewer.theme, False).canvas.as_hex()
+        )[0]
+        theme = self.viewer.events.theme
+
+        on_theme_change = self.canvas._on_theme_change
+        theme.connect(on_theme_change)
+
+        self.canvas.destroyed.connect(self._diconnect_theme)
+
         # Stacked widget to provide a welcome page
         self._canvas_overlay = QtWidgetOverlay(
             self, self.canvas.scene_canvas.native
@@ -417,47 +450,6 @@ class QtViewer(QSplitter):
             action_manager.unbind_shortcut(action)
             for shortcut in shortcuts:
                 action_manager.bind_shortcut(action, shortcut)
-
-    def _create_canvas(self) -> None:
-        """Create the canvas and hook up events."""
-        self.canvas = VispyCanvas(
-            keys=None,
-            vsync=True,
-            parent=self,
-            size=self.viewer._canvas_size[::-1],
-        )
-        self.canvas.scene_canvas.events.draw.connect(self.dims.enable_play)
-
-        self.canvas.scene_canvas.events.mouse_double_click.connect(
-            self.on_mouse_double_click
-        )
-        self.canvas.scene_canvas.events.mouse_move.connect(self.on_mouse_move)
-        self.canvas.scene_canvas.events.mouse_press.connect(
-            self.on_mouse_press
-        )
-        self.canvas.scene_canvas.events.mouse_release.connect(
-            self.on_mouse_release
-        )
-        self.canvas.scene_canvas.events.key_press.connect(
-            self._key_map_handler.on_key_press
-        )
-        self.canvas.scene_canvas.events.key_release.connect(
-            self._key_map_handler.on_key_release
-        )
-        self.canvas.scene_canvas.events.mouse_wheel.connect(
-            self.on_mouse_wheel
-        )
-        self.canvas.scene_canvas.events.draw.connect(self.on_draw)
-        self.canvas.scene_canvas.events.resize.connect(self.on_resize)
-        self.canvas.scene_canvas.bgcolor = transform_color(
-            get_theme(self.viewer.theme, False).canvas.as_hex()
-        )[0]
-        theme = self.viewer.events.theme
-
-        on_theme_change = self.canvas._on_theme_change
-        theme.connect(on_theme_change)
-
-        self.canvas.destroyed.connect(self._diconnect_theme)
 
     def _diconnect_theme(self):
         self.viewer.events.theme.disconnect(self.canvas._on_theme_change)
