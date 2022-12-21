@@ -54,6 +54,7 @@ from napari.settings import get_settings
 from napari.utils._register import create_func as create_add_method
 from napari.utils.action_manager import action_manager
 from napari.utils.colormaps import ensure_colormap
+from napari.utils.colormaps.standardize_color import transform_color
 from napari.utils.events import Event, EventedModel, disconnect_events
 from napari.utils.events.event import WarningEmitter
 from napari.utils.key_bindings import KeymapProvider
@@ -61,7 +62,7 @@ from napari.utils.migrations import rename_argument
 from napari.utils.misc import is_sequence
 from napari.utils.mouse_bindings import MousemapProvider
 from napari.utils.progress import progress
-from napari.utils.theme import available_themes
+from napari.utils.theme import available_themes, get_theme
 from napari.utils.translations import trans
 
 DEFAULT_THEME = 'dark'
@@ -170,6 +171,10 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
         )
         self.__config__.extra = Extra.ignore
 
+        self.canvas.bg_color = transform_color(
+            get_theme(self.theme, False).canvas.as_hex()
+        )[0]
+
         settings = get_settings()
         self.tooltip.visible = settings.appearance.layer_tooltip_visibility
         settings.appearance.events.layer_tooltip_visibility.connect(
@@ -215,6 +220,8 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
         self.layers.events.reordered.connect(self._on_grid_change)
         self.layers.events.reordered.connect(self._on_layers_change)
         self.layers.selection.events.active.connect(self._on_active_layer)
+
+        self.events.theme.connect(self._on_theme_change)
 
         # Add mouse callback
         self.mouse_wheel_callbacks.append(dims_scroll)
@@ -373,6 +380,11 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
             self.cursor.style = active_layer.cursor
             self.cursor.size = active_layer.cursor_size
             self.camera.interactive = active_layer.interactive
+
+    def _on_theme_change(self):
+        self.canvas.bg_color = transform_color(
+            get_theme(self.theme, False).canvas.as_hex()
+        )[0]
 
     @staticmethod
     def rounded_division(min_val, max_val, precision):

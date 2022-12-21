@@ -6,7 +6,6 @@ from vispy.scene import SceneCanvas, Widget
 
 from napari._vispy import VispyCamera
 from napari._vispy.utils.gl import get_max_texture_sizes
-from napari.utils.colormaps.standardize_color import transform_color
 
 
 class VispyCanvas:
@@ -52,8 +51,8 @@ class VispyCanvas:
         # Connecting events from SceneCanvas
         self.scene_canvas.events.draw.connect(self.viewer.dims.enable_play)
         self.scene_canvas.events.draw.connect(self.vispy_camera.on_draw)
-        self.viewer.events.theme.connect(self._on_theme_change)
-        self.destroyed.connect(self._disconnect_theme)
+        self.napari_canvas.events.bg_color.connect(self._on_background_change)
+        self.destroyed.connect(self._disconnect_background_change)
 
     @property
     def destroyed(self):
@@ -68,28 +67,25 @@ class VispyCanvas:
         self._background_color_override = value
         self.bgcolor = value or self._last_theme_color
 
-    def _on_theme_change(self, event):
-        self._set_theme_change(event.value)
-
-    def _set_theme_change(self, theme: str):
-        from napari.utils.theme import get_theme
-
+    def _on_background_change(self):
+        # TODO check whether this last theme color stuff has a purpose
         # Note 1. store last requested theme color, in case we need to reuse it
         # when clearing the background_color_override, without needing to
         # keep track of the viewer.
         # Note 2. the reason for using the `as_hex` here is to avoid
         # `UserWarning` which is emitted when RGB values are above 1
-        self._last_theme_color = transform_color(
-            get_theme(theme, False).canvas.as_hex()
-        )[0]
+        self._last_theme_color = self.napari_canvas.bg_color
         self.bgcolor = self._last_theme_color
 
-    def _disconnect_theme(self):
-        self.viewer.events.theme.disconnect(self._on_theme_change)
+    # TODO Should this be changed to disconnect on_background_change?
+    def _disconnect_background_change(self):
+        self.napari_canvas.events.bg_color.disconnect(
+            self._on_background_change
+        )
 
     @property
     def bgcolor(self):
-        self.scene_canvas.bgcolor.hex
+        return self.scene_canvas.bgcolor.hex
 
     @bgcolor.setter
     def bgcolor(self, value):

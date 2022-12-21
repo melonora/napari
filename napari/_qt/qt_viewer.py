@@ -41,7 +41,6 @@ from napari.settings import get_settings
 from napari.utils import config, perf
 from napari.utils._proxies import ReadOnlyWrapper
 from napari.utils.action_manager import action_manager
-from napari.utils.colormaps.standardize_color import transform_color
 from napari.utils.history import (
     get_open_history,
     get_save_history,
@@ -58,7 +57,6 @@ from napari.utils.interactions import (
 from napari.utils.io import imsave
 from napari.utils.key_bindings import KeymapHandler
 from napari.utils.misc import in_ipython, in_jupyter
-from napari.utils.theme import get_theme
 from napari.utils.translations import trans
 from napari_builtins.io import imsave_extensions
 
@@ -246,9 +244,6 @@ class QtViewer(QSplitter):
         )
         self.canvas.scene_canvas.events.draw.connect(self.on_draw)
         self.canvas.scene_canvas.events.resize.connect(self.on_resize)
-        self.canvas.bgcolor = transform_color(
-            get_theme(self.viewer.theme, False).canvas.as_hex()
-        )[0]
 
         # Stacked widget to provide a welcome page
         self._canvas_overlay = QtWidgetOverlay(
