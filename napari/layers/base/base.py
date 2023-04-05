@@ -875,6 +875,7 @@ class Layer(KeymapProvider, MousemapProvider, ABC):
             'experimental_clipping_planes': [
                 plane.dict() for plane in self.experimental_clipping_planes
             ],
+            'axis_labels': self.axis_labels,
         }
         return base_dict
 
