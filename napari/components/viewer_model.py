@@ -167,7 +167,7 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
     # different events systems
     mouse_over_canvas: bool = False
 
-    axis_labels: Tuple[str, ...] = ()
+    axis_labels: Tuple[str, ...] = (str(-1), str(-2))
 
     # Need to use default factory because slicer is not copyable which
     # is required for default values.
@@ -555,7 +555,7 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
         # Prepend new axis labels from layer
         new_labels = []
         for axis in layer.axis_labels:
-            if axis not in self.axis_labels:
+            if axis and axis not in self.axis_labels:
                 new_labels.append(axis)
         self.axis_labels = tuple(new_labels) + self.axis_labels
 
