@@ -7,7 +7,7 @@ from weakref import WeakSet
 
 import numpy as np
 from superqt.utils import qthrottled
-from vispy.scene import SceneCanvas as SceneCanvas_, Widget
+from vispy.scene import PanZoomCamera, SceneCanvas as SceneCanvas_, Widget
 
 from napari._vispy import VispyCamera
 from napari._vispy.utils.cursor import QtCursorVisual
@@ -156,7 +156,24 @@ class VispyCanvas:
         self.viewer.camera.events.zoom.connect(self._on_cursor)
         self.viewer.layers.events.reordered.connect(self._reorder_layers)
         self.viewer.layers.events.removed.connect(self._remove_layer)
+        self.viewer.grid.events.connect(self._on_grid_change)
         self.destroyed.connect(self._disconnect_theme)
+
+    def _on_grid_change(self):
+        grid_shape = self.viewer.grid.actual_shape(len(self.layer_to_visual))
+
+        grid = self.central_widget.add_grid()
+
+        grid_views = [
+            grid.add_view(row=y, col=x)
+            for y in range(grid_shape[0])
+            for x in range(grid_shape[1])
+        ]
+        for ind, layer in enumerate(self.layer_to_visual.values()):
+            grid_views[ind].camera = PanZoomCamera()
+            if ind != 0:
+                grid_views[ind].camera.link(grid_views[0].camera)
+            layer.node.parent = grid_views[ind].scene
 
     @property
     def destroyed(self) -> pyqtBoundSignal:
