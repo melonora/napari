@@ -6,35 +6,12 @@ from napari.settings._application import GridHeight, GridStride, GridWidth
 from napari.utils.events import EventedModel
 
 
-class GridCanvas(EventedModel):
-    """Grid for canvas.
-
-    Right now the only grid mode that is still inside one canvas with one
-    camera, but future grid modes could support multiple canvases.
-
-    Attributes
-    ----------
-    enabled : bool
-        If grid is enabled or not.
-    stride : int
-        Number of layers to place in each grid square before moving on to
-        the next square. The default ordering is to place the most visible
-        layer in the top left corner of the grid. A negative stride will
-        cause the order in which the layers are placed in the grid to be
-        reversed.
-    shape : 2-tuple of int
-        Number of rows and columns in the grid. A value of -1 for either or
-        both of will be used the row and column numbers will trigger an
-        auto calculation of the necessary grid shape to appropriately fill
-        all the layers at the appropriate stride.
-    """
-
-    # fields
+class Canvas(EventedModel):
+    grid_enabled: bool = False
     stride: GridStride = 1
     shape: Tuple[GridHeight, GridWidth] = (-1, -1)
-    enabled: bool = False
 
-    def actual_shape(self, nlayers: int = 1) -> Tuple[int, int]:
+    def actual_shape(self, nlayers: int = 1) -> Tuple[Tuple[int, int], int]:
         """Return the actual shape of the grid.
 
         This will return the shape parameter, unless one of the row
@@ -54,11 +31,11 @@ class GridCanvas(EventedModel):
         shape : 2-tuple of int
             Number of rows and columns in the grid.
         """
-        if not self.enabled:
-            return (1, 1)
+        if not self.grid_enabled:
+            return (1, 1), 0
 
         if nlayers == 0:
-            return (1, 1)
+            return (1, 1), 0
 
         n_row, n_column = self.shape
         n_grid_squares = np.ceil(nlayers / abs(self.stride)).astype(int)
@@ -74,7 +51,7 @@ class GridCanvas(EventedModel):
         n_row = max(1, n_row)
         n_column = max(1, n_column)
 
-        return (n_row, n_column)
+        return (n_row, n_column), n_grid_squares
 
     def position(self, index: int, nlayers: int) -> Tuple[int, int]:
         """Return the position of a given linear index in grid.
@@ -93,16 +70,16 @@ class GridCanvas(EventedModel):
         position : 2-tuple of int
             Row and column position of current index in the grid.
         """
-        if not self.enabled:
+        if not self.grid_enabled:
             return (0, 0)
 
-        n_row, n_column = self.actual_shape(nlayers)
+        shape, n_gridboxes = self.actual_shape(nlayers)
 
         # Adjust for forward or reverse ordering
         adj_i = nlayers - index - 1 if self.stride < 0 else index
 
         adj_i = adj_i // abs(self.stride)
-        adj_i = adj_i % (n_row * n_column)
-        i_row = adj_i // n_column
-        i_column = adj_i % n_column
+        adj_i = adj_i % (shape[0] * shape[1])
+        i_row = adj_i // shape[1]
+        i_column = adj_i % shape[1]
         return (i_row, i_column)

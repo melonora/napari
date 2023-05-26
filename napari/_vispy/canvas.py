@@ -156,24 +156,35 @@ class VispyCanvas:
         self.viewer.camera.events.zoom.connect(self._on_cursor)
         self.viewer.layers.events.reordered.connect(self._reorder_layers)
         self.viewer.layers.events.removed.connect(self._remove_layer)
-        self.viewer.grid.events.connect(self._on_grid_change)
+        self.viewer.canvases.events.grid_enabled.connect(self._on_grid_change)
+        self.viewer.canvases.events.stride.connect(self._on_grid_change)
         self.destroyed.connect(self._disconnect_theme)
 
     def _on_grid_change(self):
-        grid_shape = self.viewer.grid.actual_shape(len(self.layer_to_visual))
+        """Change grid view"""
+        if self.viewer.canvases.grid_enabled:
+            grid_shape, n_gridboxes = self.viewer.canvases.actual_shape(
+                len(self.layer_to_visual)
+            )
 
-        grid = self.central_widget.add_grid()
+            self.grid = self.central_widget.add_grid()
 
-        grid_views = [
-            grid.add_view(row=y, col=x)
-            for y in range(grid_shape[0])
-            for x in range(grid_shape[1])
-        ]
-        for ind, layer in enumerate(self.layer_to_visual.values()):
-            grid_views[ind].camera = PanZoomCamera()
-            if ind != 0:
-                grid_views[ind].camera.link(grid_views[0].camera)
-            layer.node.parent = grid_views[ind].scene
+            grid_views = [
+                self.grid.add_view(row=y, col=x)
+                for y in range(grid_shape[0])
+                for x in range(grid_shape[1])
+                if x * y < n_gridboxes
+            ]
+            for ind, layer in enumerate(self.layer_to_visual.values()):
+                grid_views[ind].camera = PanZoomCamera()
+                if ind != 0:
+                    grid_views[ind].camera.link(grid_views[0].camera)
+                layer.node.parent = grid_views[ind].scene
+        else:
+            for layer in self.layer_to_visual.values():
+                layer.node.parent = self.view.scene
+            self.central_widget.remove_widget(self.grid)
+            del self.grid
 
     @property
     def destroyed(self) -> pyqtBoundSignal:
