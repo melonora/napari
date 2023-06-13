@@ -147,7 +147,7 @@ class QtViewerButtons(QFrame):
         gvb.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         gvb.customContextMenuRequested.connect(self._open_grid_popup)
 
-        @self.viewer.grid.events.enabled.connect
+        @self.viewer.canvases.events.grid_enabled.connect
         def _set_grid_mode_checkstate(event):
             gvb.setChecked(event.value)
 
