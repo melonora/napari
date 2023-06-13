@@ -7,7 +7,7 @@ from weakref import WeakSet
 
 import numpy as np
 from superqt.utils import qthrottled
-from vispy.scene import PanZoomCamera, SceneCanvas as SceneCanvas_, Widget
+from vispy.scene import SceneCanvas as SceneCanvas_, Widget
 
 from napari._vispy import VispyCamera
 from napari._vispy.utils.cursor import QtCursorVisual
@@ -178,11 +178,18 @@ class VispyCanvas:
                 if x * y < n_gridboxes
             ]
             self.camera._view = grid_views[0]
+            self.grid_cameras = [
+                VispyCamera(
+                    grid_views[i], self.viewer.camera, self.viewer.dims
+                )
+                for i in range(len(grid_views[1:]))
+            ]
 
             for ind, layer in enumerate(self.layer_to_visual.values()):
-                # grid_views[ind].camera = PanZoomCamera()
                 if ind != 0:
-                    grid_views[ind].camera = PanZoomCamera()
+                    grid_views[ind].camera = self.grid_cameras[
+                        ind - 1
+                    ]._view.camera
                     grid_views[ind].camera.link(grid_views[0].camera)
                 layer.node.parent = grid_views[ind].scene
         else:
