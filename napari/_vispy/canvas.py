@@ -177,6 +177,8 @@ class VispyCanvas:
                 for x in range(grid_shape[1])
                 if x * y < n_gridboxes
             ]
+            self.camera._view = grid_views[0]
+
             for ind, layer in enumerate(self.layer_to_visual.values()):
                 # grid_views[ind].camera = PanZoomCamera()
                 if ind != 0:
