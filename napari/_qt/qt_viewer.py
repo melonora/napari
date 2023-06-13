@@ -482,6 +482,7 @@ class QtViewer(QSplitter):
     @ensure_main_thread
     def _on_slice_ready(self, event):
         responses = event.value
+        logging.debug('QtViewer._on_slice_ready: %s', responses)
         for layer, response in responses.items():
             # Update the layer slice state to temporarily support behavior
             # that depends on it.
@@ -568,9 +569,10 @@ class QtViewer(QSplitter):
         dlg.setHistory(hist)
 
         filename, selected_filter = dlg.getSaveFileName(
-            parent=self,
-            caption=trans._('Save {msg} layers', msg=msg),
-            directory=hist[0],  # home dir by default,
+            self,  # parent
+            trans._('Save {msg} layers', msg=msg),  # caption
+            # home dir by default
+            hist[0],  # directory in PyQt, dir in PySide
             filter=ext_str,
             options=(
                 QFileDialog.DontUseNativeDialog
