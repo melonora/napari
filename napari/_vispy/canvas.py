@@ -168,16 +168,19 @@ class VispyCanvas:
             )
 
             self.grid = self.central_widget.add_grid()
-
+            camera = self.camera._view.camera
             grid_views = [
-                self.grid.add_view(row=y, col=x)
+                self.grid.add_view(
+                    row=y, col=x, camera=camera if y == 0 and x == 0 else None
+                )
                 for y in range(grid_shape[0])
                 for x in range(grid_shape[1])
                 if x * y < n_gridboxes
             ]
             for ind, layer in enumerate(self.layer_to_visual.values()):
-                grid_views[ind].camera = PanZoomCamera()
+                # grid_views[ind].camera = PanZoomCamera()
                 if ind != 0:
+                    grid_views[ind].camera = PanZoomCamera()
                     grid_views[ind].camera.link(grid_views[0].camera)
                 layer.node.parent = grid_views[ind].scene
         else:
