@@ -293,8 +293,8 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
 
         settings = get_settings()
 
-        self.grid.stride = settings.application.grid_stride
-        self.grid.shape = (
+        self.canvases.stride = settings.application.grid_stride
+        self.canvases.shape = (
             settings.application.grid_height,
             settings.application.grid_width,
         )
