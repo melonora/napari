@@ -188,6 +188,7 @@ class VispyCanvas:
         else:
             for layer in self.layer_to_visual.values():
                 layer.node.parent = self.view.scene
+            self.camera._view = self.view
             self.central_widget.remove_widget(self.grid)
             del self.grid
 
