@@ -259,7 +259,6 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
         )
         self.layers.events.inserted.connect(self._on_add_layer)
         self.layers.events.removed.connect(self._on_remove_layer)
-        self.layers.events.reordered.connect(self._on_grid_change)
         self.layers.events.reordered.connect(self._on_layers_change)
         self.layers.selection.events.active.connect(self._on_active_layer)
 
@@ -363,7 +362,9 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
         extent = self._sliced_extent_world_augmented
         scene_size = extent[1] - extent[0]
         corner = extent[0]
-        grid_size = list(self.grid.actual_shape(len(self.layers)))
+        grid_size, n_grid_squares = list(
+            self.canvases.actual_shape(len(self.layers))
+        )
         if len(scene_size) > len(grid_size):
             grid_size = [1] * (len(scene_size) - len(grid_size)) + grid_size
         size = np.multiply(scene_size, grid_size)
@@ -519,32 +520,6 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
         else:
             self.status = 'Ready'
 
-    def _on_grid_change(self):
-        """Arrange the current layers is a 2D grid."""
-        extent = self._sliced_extent_world_augmented
-        n_layers = len(self.layers)
-        for i, layer in enumerate(self.layers):
-            i_row, i_column = self.grid.position(n_layers - 1 - i, n_layers)
-            self._subplot(layer, (i_row, i_column), extent)
-
-    def _subplot(self, layer, position, extent):
-        """Shift a layer to a specified position in a 2D grid.
-
-        Parameters
-        ----------
-        layer : napari.layers.Layer
-            Layer that is to be moved.
-        position : 2-tuple of int
-            New position of layer in grid.
-        extent : array, shape (2, D)
-            Extent of the world.
-        """
-        scene_shift = extent[1] - extent[0]
-        translate_2d = np.multiply(scene_shift[-2:], position)
-        translate = [0] * layer.ndim
-        translate[-2:] = translate_2d
-        layer._translate_grid = translate
-
     @property
     def experimental(self):
         """Experimental commands for IPython console.
@@ -588,7 +563,6 @@ class ViewerModel(KeymapProvider, MousemapProvider, EventedModel):
 
         # Update dims and grid model
         self._on_layers_change()
-        self._on_grid_change()
         # Slice current layer based on dims
         self._update_layers(layers=[layer])
 
