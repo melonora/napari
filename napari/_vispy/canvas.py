@@ -156,7 +156,50 @@ class VispyCanvas:
         self.viewer.camera.events.zoom.connect(self._on_cursor)
         self.viewer.layers.events.reordered.connect(self._reorder_layers)
         self.viewer.layers.events.removed.connect(self._remove_layer)
+        self.viewer.canvases.events.grid_enabled.connect(self._on_grid_change)
+        self.viewer.canvases.events.stride.connect(self._on_grid_change)
         self.destroyed.connect(self._disconnect_theme)
+
+    def _on_grid_change(self):
+        """Change grid view"""
+        if self.viewer.canvases.grid_enabled:
+            grid_shape, n_gridboxes = self.viewer.canvases.actual_shape(
+                len(self.layer_to_visual)
+            )
+
+            self.grid = self.central_widget.add_grid()
+            camera = self.camera._view.camera
+            self.grid_views = [
+                self.grid.add_view(
+                    row=y, col=x, camera=camera if y == 0 and x == 0 else None
+                )
+                for y in range(grid_shape[0])
+                for x in range(grid_shape[1])
+                if x * y < n_gridboxes
+            ]
+            self.camera._view = self.grid_views[0]
+            self.central_widget.remove_widget(self.view)
+            # del self.view
+            self.grid_cameras = [
+                VispyCamera(
+                    self.grid_views[i], self.viewer.camera, self.viewer.dims
+                )
+                for i in range(len(self.grid_views[1:]))
+            ]
+
+            for ind, layer in enumerate(self.layer_to_visual.values()):
+                if ind != 0:
+                    self.grid_views[ind].camera = self.grid_cameras[
+                        ind - 1
+                    ]._view.camera
+                    self.grid_views[ind].camera.link(self.grid_views[0].camera)
+                layer.node.parent = self.grid_views[ind].scene
+        else:
+            for layer in self.layer_to_visual.values():
+                layer.node.parent = self.view.scene
+            self.camera._view = self.view
+            self.central_widget.remove_widget(self.grid)
+            del self.grid
 
     @property
     def destroyed(self) -> pyqtBoundSignal:
@@ -314,7 +357,11 @@ class VispyCanvas:
             of the viewer.
         """
         nd = self.viewer.dims.ndisplay
-        transform = self.view.scene.transform
+        # TODO look into how to extend this to all grid boxes
+        if self.viewer.canvases.grid_enabled:
+            transform = self.grid_views[0].scene.transform
+        else:
+            transform = self.view.scene.transform
         mapped_position = transform.imap(list(position))[:nd]
         position_world_slice = mapped_position[::-1]
 
