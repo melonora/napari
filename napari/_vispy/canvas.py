@@ -169,7 +169,7 @@ class VispyCanvas:
 
             self.grid = self.central_widget.add_grid()
             camera = self.camera._view.camera
-            grid_views = [
+            self.grid_views = [
                 self.grid.add_view(
                     row=y, col=x, camera=camera if y == 0 and x == 0 else None
                 )
@@ -177,21 +177,23 @@ class VispyCanvas:
                 for x in range(grid_shape[1])
                 if x * y < n_gridboxes
             ]
-            self.camera._view = grid_views[0]
+            self.camera._view = self.grid_views[0]
+            self.central_widget.remove_widget(self.view)
+            # del self.view
             self.grid_cameras = [
                 VispyCamera(
-                    grid_views[i], self.viewer.camera, self.viewer.dims
+                    self.grid_views[i], self.viewer.camera, self.viewer.dims
                 )
-                for i in range(len(grid_views[1:]))
+                for i in range(len(self.grid_views[1:]))
             ]
 
             for ind, layer in enumerate(self.layer_to_visual.values()):
                 if ind != 0:
-                    grid_views[ind].camera = self.grid_cameras[
+                    self.grid_views[ind].camera = self.grid_cameras[
                         ind - 1
                     ]._view.camera
-                    grid_views[ind].camera.link(grid_views[0].camera)
-                layer.node.parent = grid_views[ind].scene
+                    self.grid_views[ind].camera.link(self.grid_views[0].camera)
+                layer.node.parent = self.grid_views[ind].scene
         else:
             for layer in self.layer_to_visual.values():
                 layer.node.parent = self.view.scene
@@ -355,7 +357,11 @@ class VispyCanvas:
             of the viewer.
         """
         nd = self.viewer.dims.ndisplay
-        transform = self.view.scene.transform
+        # TODO look into how to extend this to all grid boxes
+        if self.viewer.canvases.grid_enabled:
+            transform = self.grid_views[0].scene.transform
+        else:
+            transform = self.view.scene.transform
         mapped_position = transform.imap(list(position))[:nd]
         position_world_slice = mapped_position[::-1]
 
