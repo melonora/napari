@@ -972,3 +972,28 @@ def test_slice_order_with_mixed_dims():
     assert image_2d._slice.image.view.shape == (4, 5)
     assert image_3d._slice.image.view.shape == (3, 5)
     assert image_4d._slice.image.view.shape == (2, 5)
+
+
+def test_viewer_add_layer_with_axes_labels():
+    """When adding a layer with axes labels the axes labels in the viewer model should be updated as should axes labels in
+    dims model. axes labels here should be the unification of axes labels of all layers in the model.
+    """
+
+
+def test_viewer_multiple_layer_axes_labels():
+    """When adding multiple layers to the viewer with the same axes labels the axes labels attribute of the viewer model
+    should stay the same. When layers do not share axes labels, the axes labels in the viewer model should be expanded.
+    """
+
+
+def test_viewer_annotation_layer_axes_labels():
+    """When adding a new layer to annotate (for example with shapes layer) an image layer, the axes labels of the parent
+    layer should be inherited."""
+
+
+def test_layer_select_updates_viewer_axes_labels():
+    """In case we have more than 1 layer not sharing labels the visible axes labels should be updated when selecting a
+    different layer. This could require a property of displayed axis labels and hidden_axis labels for the viewer. Later
+    this kind of functionality would have to be moved to canvas where each canvas is for displaying a given set of axes
+    and if there is an axes not part of this set it would require a second canvas. For now those layers with hidden axes
+    labels could be set to not visible."""

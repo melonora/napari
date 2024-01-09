@@ -555,3 +555,7 @@ def test_readd_layers():
     with pytest.raises(ValueError):
         layers[:3] = layers[:]
     assert set(layers) == set(imgs)
+
+
+def test_layerlist_axis_labels():
+    "Test that layerlist.axis_labels correspond to the actual labels."
