@@ -1,10 +1,32 @@
+import numpy as np
+import pytest
+
+from napari.layers import Image
+
+
 # These tests would be for testing the layers itself
 def test_get_layer_axes_labels():
     "For a given layer we should be able to retrieve axes labels."
+    shape = (10, 15)
+    np.random.seed(0)
+    data = np.random.random(shape)
+    layer = Image(data, axes_labels=("y", "x"))
+    assert layer.axes_labels == ("y", "x")
 
 
 def test_set_layer_axes_labels():
     "For a given layer we should be able to set the axes labels."
+    shape = (10, 15)
+    np.random.seed(0)
+    data = np.random.random(shape)
+    layer = Image(data, axes_label=("y", "x"))
+    with pytest.raises(ValueError):
+        layer.axes_labels = ("z", "y", "x")
+
+    layer.axes_labels = ("z", "t")
+    assert layer.axes_labels == ("z", "t")
+
+    # Note: should we give a warning if reversing axes labels for example y,x to x, y
 
 
 def test_default_axes_labels():
