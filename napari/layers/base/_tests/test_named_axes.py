@@ -33,6 +33,10 @@ def test_default_axes_labels():
     """If no axes labels are given, default names should be assigned equal to the number of dimensions of a particular
     layer."""
     # Note that for broadcasting the default names should be based on negative integers, so ..., -2, -1.
+    shape = (10, 15)
+    data = np.random.random(shape)
+    layer = Image(data)
+    assert layer.axes_labels == (-2, -1)
 
 
 def test_ndim_match_length_axes_labels():
