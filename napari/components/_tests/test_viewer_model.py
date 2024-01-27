@@ -976,6 +976,23 @@ def test_slice_order_with_mixed_dims():
 
 def test_viewer_add_layer_with_axes_labels():
     "When we add a layer to the viewer model, the axis labels in the dims should be properly updated"
+    viewer = ViewerModel(ndisplay=2)
+    assert viewer.dims.axes_labels == ('-2', '-1')
+    with pytest.raises(ValueError):
+        viewer.add_image(np.zeros((4, 5)), axes_labels=("z", "y", "x"))
+    viewer.add_image(np.zeros((4, 5)), axes_labels=("x", "y"))
+    assert viewer.dims.axes_labels == ("x", "y")
+
+    # Ensure axes labels stay the same when image with same axes labels are added
+    viewer.add_image(np.zeros((4, 5)), axes_labels=("x", "y"))
+    assert viewer.dims.axes_labels == ("x", "y")
+
+    # Ensure axes labels are updated when layer with different axes labels than currently present are added.
+    viewer.add_image(np.zeros((4, 5, 5)), axes_labels=("a", "b", "c"))
+    assert viewer.dims.axes_labels == ("a", "b", "c", "x", "y")
+
+    assert viewer.dims.displayed == ("a", "b", "c")
+    assert viewer.dims.not_displayed == ("x", "y")
 
 
 def test_viewer_multiple_layer_axes_labels():
