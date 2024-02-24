@@ -377,6 +377,7 @@ class Points(Layer):
         antialiasing=1,
         shown=True,
         projection_mode='none',
+        axes_labels = (),
     ) -> None:
         if ndim is None and scale is not None:
             ndim = len(scale)

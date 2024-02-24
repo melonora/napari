@@ -301,6 +301,7 @@ class Labels(_ImageBase):
         plane=None,
         experimental_clipping_planes=None,
         projection_mode='none',
+        axes_labels = (),
     ) -> None:
         if name is None and data is not None:
             name = magic_name(data)
@@ -321,6 +322,7 @@ class Labels(_ImageBase):
         self._cached_mapped_labels = np.zeros((0, 4), dtype=np.uint8)
 
         data = self._ensure_int_labels(data)
+        self.axes_labels = tuple(i for i in range(-data.ndim, 0))
 
         super().__init__(
             data,

@@ -295,6 +295,7 @@ class Layer(KeymapProvider, MousemapProvider, ABC):
         experimental_clipping_planes=None,
         mode='pan_zoom',
         projection_mode='none',
+        axes_labels: tuple[str] = ()
     ) -> None:
         super().__init__()
 

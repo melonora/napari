@@ -236,6 +236,7 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
         data,
         *,
         rgb=None,
+        axes_labels = (),
         colormap='gray',
         contrast_limits=None,
         gamma=1.0,
@@ -272,6 +273,8 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
             raise ValueError(
                 trans._('Image data must have at least 2 dimensions.')
             )
+
+        self.axes_labels = tuple(i for i in range(-data.ndim, 0))
 
         # Determine if data is a multiscale
         self._data_raw = data
