@@ -236,7 +236,7 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
         data,
         *,
         rgb=None,
-        axes_labels = (),
+        axis_labels: Sequence[str | int] | None = None,
         colormap='gray',
         contrast_limits=None,
         gamma=1.0,
@@ -273,8 +273,6 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
             raise ValueError(
                 trans._('Image data must have at least 2 dimensions.')
             )
-
-        self.axes_labels = tuple(i for i in range(-data.ndim, 0))
 
         # Determine if data is a multiscale
         self._data_raw = data
@@ -317,6 +315,7 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
             cache=cache,
             experimental_clipping_planes=experimental_clipping_planes,
             projection_mode=projection_mode,
+            axis_labels=axis_labels,
         )
 
         self.events.add(
