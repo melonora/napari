@@ -183,7 +183,7 @@ class Surface(IntensityVisualizationMixin, Layer):
     def __init__(
         self,
         data,
-        axis_labels: Sequence[str|int]| None=None,
+        axis_labels: Sequence[str | int] | None = None,
         *,
         colormap='gray',
         contrast_limits=None,
@@ -213,7 +213,7 @@ class Surface(IntensityVisualizationMixin, Layer):
         super().__init__(
             data,
             axis_labels=axis_labels,
-            ndim,
+            ndim=ndim,
             name=name,
             metadata=metadata,
             scale=scale,
