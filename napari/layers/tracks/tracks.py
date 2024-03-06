@@ -2,7 +2,7 @@
 # from napari.utils.events import Event
 # from napari.utils.colormaps import AVAILABLE_COLORMAPS
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Sequence, Union
 from warnings import warn
 
 import numpy as np
@@ -97,6 +97,7 @@ class Tracks(Layer):
     def __init__(
         self,
         data,
+        axis_labels: Sequence[str|int]| None=None,
         *,
         features=None,
         properties=None,
@@ -131,6 +132,7 @@ class Tracks(Layer):
         super().__init__(
             data,
             ndim,
+            axis_labels=axis_labels,
             name=name,
             metadata=metadata,
             scale=scale,

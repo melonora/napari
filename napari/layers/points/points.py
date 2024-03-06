@@ -340,6 +340,7 @@ class Points(Layer):
         self,
         data=None,
         *,
+        axis_labels: Sequence[str| int] | None=None
         ndim=None,
         features=None,
         feature_defaults=None,
@@ -377,7 +378,6 @@ class Points(Layer):
         antialiasing=1,
         shown=True,
         projection_mode='none',
-        axes_labels = (),
     ) -> None:
         if ndim is None and scale is not None:
             ndim = len(scale)
@@ -411,6 +411,7 @@ class Points(Layer):
         super().__init__(
             data,
             ndim,
+            axis_labels=axis_labels,
             name=name,
             metadata=metadata,
             scale=scale,

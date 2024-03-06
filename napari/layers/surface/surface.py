@@ -1,6 +1,6 @@
 import copy
 import warnings
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -183,6 +183,7 @@ class Surface(IntensityVisualizationMixin, Layer):
     def __init__(
         self,
         data,
+        axis_labels: Sequence[str|int]| None=None,
         *,
         colormap='gray',
         contrast_limits=None,
@@ -211,6 +212,7 @@ class Surface(IntensityVisualizationMixin, Layer):
 
         super().__init__(
             data,
+            axis_labels=axis_labels,
             ndim,
             name=name,
             metadata=metadata,
