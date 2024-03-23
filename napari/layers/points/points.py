@@ -340,7 +340,7 @@ class Points(Layer):
         self,
         data=None,
         *,
-        axis_labels: Sequence[str| int] | None=None
+        axis_labels=None,
         ndim=None,
         features=None,
         feature_defaults=None,

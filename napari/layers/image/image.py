@@ -236,7 +236,7 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
         data,
         *,
         rgb=None,
-        axis_labels: Sequence[str | int] | None = None,
+        axis_labels=None,
         colormap='gray',
         contrast_limits=None,
         gamma=1.0,

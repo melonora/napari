@@ -9,7 +9,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    Sequence,
     Set,
     Tuple,
     Union,
@@ -417,7 +416,7 @@ class Shapes(Layer):
 
     def __init__(
         self,
-        axis_labels:Sequence [str|int]|None=None,
+        axis_labels=None,
         data=None,
         *,
         ndim=None,

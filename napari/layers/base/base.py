@@ -297,7 +297,7 @@ class Layer(KeymapProvider, MousemapProvider, ABC):
         experimental_clipping_planes=None,
         mode='pan_zoom',
         projection_mode='none',
-        axis_labels: Sequence[str | int] | None = None,
+        axis_labels=None,
     ) -> None:
         super().__init__()
 
