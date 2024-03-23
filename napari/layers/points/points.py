@@ -373,6 +373,7 @@ class Points(Layer):
         self,
         data=None,
         *,
+        layer_axis_labels=None,
         ndim=None,
         features=None,
         feature_defaults=None,
@@ -450,6 +451,7 @@ class Points(Layer):
         super().__init__(
             data,
             ndim,
+            layer_axis_labels=layer_axis_labels,
             name=name,
             metadata=metadata,
             scale=scale,

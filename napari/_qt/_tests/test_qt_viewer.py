@@ -814,6 +814,11 @@ def test_axes_labels(make_napari_viewer):
     assert tuple(axes_visual.node.text.text) == ('2', '1', '0')
 
 
+def test_axes_visual_corresponds_to_axes_labels():
+    """If we create an axes overlay visual, the text should be corresponding to the axes_labels of the particular layer of
+    which the axes are visualized"""
+
+
 @pytest.fixture()
 def qt_viewer(qtbot):
     qt_viewer = QtViewer(ViewerModel())

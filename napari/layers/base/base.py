@@ -8,6 +8,7 @@ import os.path
 import warnings
 from abc import ABC, ABCMeta, abstractmethod
 from collections import defaultdict
+from collections.abc import Iterable
 from contextlib import contextmanager
 from functools import cached_property
 from typing import (
@@ -19,6 +20,7 @@ from typing import (
     Generator,
     List,
     Optional,
+    Sequence,
     Tuple,
     Type,
     Union,
@@ -315,6 +317,7 @@ class Layer(KeymapProvider, MousemapProvider, ABC, metaclass=PostInit):
         experimental_clipping_planes=None,
         mode='pan_zoom',
         projection_mode='none',
+        layer_axis_labels=None,
     ):
         super().__init__()
 
@@ -356,6 +359,10 @@ class Layer(KeymapProvider, MousemapProvider, ABC, metaclass=PostInit):
         self._refresh_blocked = False
 
         self._ndim = ndim
+
+        self.layer_axis_labels = self._validate_coerce_axis_labels(
+            layer_axis_labels
+        )
 
         self._slice_input = _SliceInput(
             ndisplay=2,
@@ -547,6 +554,40 @@ class Layer(KeymapProvider, MousemapProvider, ABC, metaclass=PostInit):
             self.help = ''
 
         return mode
+
+    def _validate_coerce_axis_labels(
+        self, axis_labels: Sequence[str | int] | None
+    ) -> tuple[str]:
+        """Check proper input of axis labels and coerce it to a tuple of strings.
+
+        Paramters
+        ---------
+        axis_labels : Sequence[str | int] | None
+            Axis labels of the layer
+
+        Returns
+        -------
+        tuple[str]
+            Validated axis labels coerced to a tuple of strings
+        """
+        if axis_labels is None:
+            axis_labels = tuple(str(-i) for i in range(self._ndim, 0, -1))
+        elif (
+            isinstance(axis_labels, Iterable)
+            and len(axis_labels) == self._ndim
+        ):
+            axis_labels = tuple(str(i) for i in axis_labels)
+
+        return axis_labels
+
+    @property
+    def axis_labels(self) -> tuple[str]:
+        """The axis labels of the layer."""
+        return self._axis_labels
+
+    @axis_labels.setter
+    def axis_labels(self, axis_labels: Sequence[str | int] | None):
+        self._axis_labels = self._validate_coerce_axis_labels(axis_labels)
 
     @property
     def mode(self) -> str:

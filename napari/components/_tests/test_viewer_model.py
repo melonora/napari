@@ -974,3 +974,36 @@ def test_slice_order_with_mixed_dims():
     assert image_2d._slice.image.view.shape == (4, 5)
     assert image_3d._slice.image.view.shape == (3, 5)
     assert image_4d._slice.image.view.shape == (2, 5)
+
+
+def test_viewer_add_layer_with_axes_labels():
+    "When we add a layer to the viewer model, the axis labels in the dims should be properly updated"
+    viewer = ViewerModel(ndisplay=2)
+    assert viewer.dims.axes_labels == ('-2', '-1')
+    with pytest.raises(ValueError):
+        viewer.add_image(np.zeros((4, 5)), axes_labels=('z', 'y', 'x'))
+    viewer.add_image(np.zeros((4, 5)), axes_labels=('x', 'y'))
+    assert viewer.dims.axes_labels == ('x', 'y')
+
+    # Ensure axes labels stay the same when image with same axes labels are added
+    viewer.add_image(np.zeros((4, 5)), axes_labels=('x', 'y'))
+    assert viewer.dims.axes_labels == ('x', 'y')
+
+    # Ensure axes labels are updated when layer with different axes labels than currently present are added.
+    viewer.add_image(np.zeros((4, 5, 5)), axes_labels=('a', 'b', 'c'))
+    assert viewer.dims.axes_labels == ('a', 'b', 'c', 'x', 'y')
+
+    assert viewer.dims.displayed == ('a', 'b', 'c')
+    assert viewer.dims.not_displayed == ('x', 'y')
+
+
+def test_viewer_multiple_layer_axes_labels():
+    """When adding multiple layers to the viewer with the same axes labels the axes labels of the dims model should stay
+    the same. When layers do not share axes labels, the axes labels in the dims model should be updated. The attribute
+    not_displayed of the dims model should also be properly updated.
+    """
+
+
+def test_viewer_annotation_layer_axes_labels():
+    """When adding a new layer to annotate (for example with shapes layer) an image layer, the axes labels of the parent
+    layer should be inherited."""

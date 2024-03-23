@@ -279,6 +279,7 @@ class Labels(ScalarFieldBase):
         self,
         data,
         *,
+        layer_axis_labels=None,
         affine=None,
         blending='translucent',
         cache=True,
@@ -318,10 +319,9 @@ class Labels(ScalarFieldBase):
         self._show_selected_label = False
         self._contour = 0
 
-        data = self._ensure_int_labels(data)
-
         super().__init__(
             data,
+            layer_axis_labels=layer_axis_labels,
             rendering=rendering,
             depiction=depiction,
             name=name,
