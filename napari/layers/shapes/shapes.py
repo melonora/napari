@@ -416,7 +416,7 @@ class Shapes(Layer):
 
     def __init__(
         self,
-        axis_labels=None,
+        layer_axis_labels=None,
         data=None,
         *,
         ndim=None,
@@ -468,7 +468,7 @@ class Shapes(Layer):
 
         super().__init__(
             data,
-            axis_labels=axis_labels,
+            layer_axis_labels=layer_axis_labels,
             ndim=ndim,
             name=name,
             metadata=metadata,

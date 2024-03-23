@@ -297,7 +297,7 @@ class Layer(KeymapProvider, MousemapProvider, ABC):
         experimental_clipping_planes=None,
         mode='pan_zoom',
         projection_mode='none',
-        axis_labels=None,
+        layer_axis_labels=None,
     ) -> None:
         super().__init__()
 
@@ -340,7 +340,9 @@ class Layer(KeymapProvider, MousemapProvider, ABC):
 
         self._ndim = ndim
 
-        self._axis_labels = self._validate_coerce_axis_labels(axis_labels)
+        self.layer_axis_labels = self._validate_coerce_axis_labels(
+            layer_axis_labels
+        )
 
         self._slice_input = _SliceInput(
             ndisplay=2,

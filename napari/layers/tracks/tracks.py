@@ -97,7 +97,7 @@ class Tracks(Layer):
     def __init__(
         self,
         data,
-        axis_labels=None,
+        layer_axis_labels=None,
         *,
         features=None,
         properties=None,
@@ -132,7 +132,7 @@ class Tracks(Layer):
         super().__init__(
             data,
             ndim,
-            axis_labels=axis_labels,
+            layer_axis_labels=layer_axis_labels,
             name=name,
             metadata=metadata,
             scale=scale,

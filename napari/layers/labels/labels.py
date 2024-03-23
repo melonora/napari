@@ -279,7 +279,7 @@ class Labels(_ImageBase):
         self,
         data,
         *,
-        axis_labels=None,
+        layer_axis_labels=None,
         num_colors=49,
         features=None,
         properties=None,
@@ -324,7 +324,7 @@ class Labels(_ImageBase):
         super().__init__(
             data,
             rgb=False,
-            axis_labels=axis_labels,
+            layer_axis_labels=layer_axis_labels,
             colormap=self._random_colormap,
             contrast_limits=[0.0, 2**23 - 1.0],
             interpolation2d='nearest',

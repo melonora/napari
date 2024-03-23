@@ -42,14 +42,11 @@ def test_default_axes_labels():
 def test_ndim_match_length_axes_labels():
     """The number of dimensions must match the length of axes labels when creating a layer and should throw an error
     if not the case"""
-<<<<<<< Updated upstream:napari/layers/base/_tests/test_named_axes.py
-
-=======
     shape = (10, 15)
     data = np.random.random(shape)
     layer = Image(data, axes_labels=("y", "x"))
     assert layer.dim == 2
->>>>>>> Stashed changes:napari/layers/base/test_named_axes.py
+
 
 def test_slice_using_axes_labels():
     "We should be able to slice based on current axes labels and an interval."

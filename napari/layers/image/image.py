@@ -236,7 +236,7 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
         data,
         *,
         rgb=None,
-        axis_labels=None,
+        layer_axis_labels=None,
         colormap='gray',
         contrast_limits=None,
         gamma=1.0,
@@ -315,7 +315,7 @@ class _ImageBase(IntensityVisualizationMixin, Layer):
             cache=cache,
             experimental_clipping_planes=experimental_clipping_planes,
             projection_mode=projection_mode,
-            axis_labels=axis_labels,
+            layer_axis_labels=layer_axis_labels,
         )
 
         self.events.add(
