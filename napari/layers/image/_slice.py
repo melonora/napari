@@ -103,7 +103,7 @@ class _ImageSliceResponse:
         shape = (1,) * slice_input.ndisplay
         if rgb:
             shape = shape + (3,)
-        data = np.zeros(shape)
+        data = np.zeros(shape, dtype=np.uint8)
         image = _ImageView.from_view(data)
         ndim = slice_input.ndim
         tile_to_data = Affine(
@@ -121,7 +121,20 @@ class _ImageSliceResponse:
     def to_displayed(
         self, converter: Callable[[np.ndarray], np.ndarray]
     ) -> '_ImageSliceResponse':
-        """Returns a raw slice converted for display, which is needed for Labels."""
+        """
+        Returns a raw slice converted for display,
+        which is needed for Labels and Image.
+
+        Parameters
+        ----------
+        converter : Callable[[np.ndarray], np.ndarray]
+            A function that converts the raw image to a vispy viewable image.
+
+        Returns
+        -------
+        _ImageSliceResponse
+            Contains the converted image and thumbnail.
+        """
         image = _ImageView.from_raw(raw=self.image.raw, converter=converter)
         thumbnail = image
         if self.thumbnail is not self.image:
@@ -241,7 +254,8 @@ class _ImageSliceRequest:
         )
 
         # slice displayed dimensions to get the right tile data
-        data = np.asarray(data[tuple(disp_slice)])
+        data = data[tuple(disp_slice)]
+
         # project the thick slice
         data_slice = self._thick_slice_at_level(level)
         data = self._project_thick_slice(data, data_slice)
@@ -277,9 +291,12 @@ class _ImageSliceRequest:
 
     def _project_thick_slice(
         self, data: ArrayLike, data_slice: _ThickNDSlice
-    ) -> ArrayLike:
+    ) -> np.ndarray:
         """
         Slice the given data with the given data slice and project the extra dims.
+
+        This is also responsible for materializing the data if it is backed
+        by a lazy store or compute graph (e.g. dask).
         """
 
         if self.projection_mode == 'none':

@@ -1,3 +1,8 @@
+"""Non-Qt processors.
+
+Qt processors can be found in `napari/_qt/_qapp_model/injection/_qprocessors.py`.
+"""
+
 import sys
 from concurrent.futures import Future
 from contextlib import nullcontext, suppress
@@ -32,7 +37,7 @@ def _add_layer_data_tuples_to_viewer(
         data = data if isinstance(data, list) else [data]
         for datum in ensure_list_of_layer_data_tuple(data):
             # then try to update a viewer layer with the same name.
-            if len(datum) > 1 and (name := datum[1].get("name")):
+            if len(datum) > 1 and (name := datum[1].get('name')):
                 with suppress(KeyError):
                     layer = viewer.layers[name]
                     layer.data = datum[0]
@@ -88,10 +93,10 @@ def _add_layer_data_to_viewer(
             ] is not type(None):
                 # this case should be impossible, but we'll check anyway.
                 raise TypeError(
-                    f"napari supports only Optional[<layer_data_type>], not {return_type}"
+                    f'napari supports only Optional[<layer_data_type>], not {return_type}'
                 )
             return_type = return_type.__args__[0]
-        layer_type = return_type.__name__.replace("Data", "").lower()
+        layer_type = return_type.__name__.replace('Data', '').lower()
         with layer_source(**source) if source else nullcontext():
             getattr(viewer, f'add_{layer_type}')(data=data, name=layer_name)
 
@@ -167,12 +172,12 @@ def _add_future_data(
     _FUTURES.add(future)
 
 
-# Add future and LayerData processors for each layer type.
 PROCESSORS: Dict[object, Callable] = {
     types.LayerDataTuple: _add_layer_data_tuples_to_viewer,
     List[types.LayerDataTuple]: _add_layer_data_tuples_to_viewer,
     layers.Layer: _add_layer_to_viewer,
 }
+# Add future and LayerData processors for each layer type.
 for t in types._LayerData.__args__:  # type: ignore [attr-defined]
     PROCESSORS[t] = partial(_add_layer_data_to_viewer, return_type=t)
 

@@ -1,5 +1,6 @@
 """guess_rgb, guess_multiscale, guess_labels.
 """
+
 from typing import Any, Callable, Literal, Sequence, Tuple, Union
 
 import numpy as np
@@ -95,7 +96,7 @@ def guess_multiscale(
     return True, MultiScaleData(data)
 
 
-def guess_labels(data: Any) -> Literal["labels", "image"]:
+def guess_labels(data: Any) -> Literal['labels', 'image']:
     """Guess if array contains labels data."""
 
     if hasattr(data, 'dtype') and data.dtype in (
@@ -111,7 +112,7 @@ def guess_labels(data: Any) -> Literal["labels", "image"]:
 
 def project_slice(
     data: npt.NDArray, axis: Tuple[int, ...], mode: ImageProjectionMode
-) -> float:
+) -> npt.NDArray:
     """Project a thick slice along axis based on mode."""
     func: Callable
     if mode == ImageProjectionMode.SUM:

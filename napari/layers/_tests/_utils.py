@@ -1,58 +1,33 @@
 import numpy as np
-import pytest
-from numpy.testing import assert_array_equal
-from skimage.util import img_as_ubyte
-
-from napari.layers.utils.layer_utils import convert_to_uint8
 
 
-@pytest.mark.filterwarnings("ignore:Downcasting uint:UserWarning:skimage")
-@pytest.mark.parametrize("dtype", [np.uint8, np.uint16, np.uint32, np.uint64])
-def test_uint(dtype):
-    data = np.arange(50, dtype=dtype)
-    data_scaled = data * 256 ** (data.dtype.itemsize - 1)
-    assert convert_to_uint8(data_scaled).dtype == np.uint8
-    assert_array_equal(data, convert_to_uint8(data_scaled))
-    assert_array_equal(img_as_ubyte(data), convert_to_uint8(data))
-    assert_array_equal(
-        img_as_ubyte(data_scaled), convert_to_uint8(data_scaled)
-    )
+def compare_dicts(dict1, dict2):
+    """
+    The compare_dicts method compares two dictionaries for equality.
 
+    This is mainly used to allow for layer.data.events tests in order to avoid comparison of 2 arrays.
 
-@pytest.mark.filterwarnings("ignore:Downcasting int:UserWarning:skimage")
-@pytest.mark.parametrize("dtype", [np.int8, np.int16, np.int32, np.int64])
-def test_int(dtype):
-    data = np.arange(50, dtype=dtype)
-    data_scaled = data * 256 ** (data.dtype.itemsize - 1)
-    assert convert_to_uint8(data).dtype == np.uint8
-    assert convert_to_uint8(data_scaled).dtype == np.uint8
-    assert_array_equal(img_as_ubyte(data), convert_to_uint8(data))
-    assert_array_equal(2 * data, convert_to_uint8(data_scaled))
-    assert_array_equal(
-        img_as_ubyte(data_scaled), convert_to_uint8(data_scaled)
-    )
-    assert_array_equal(img_as_ubyte(data - 10), convert_to_uint8(data - 10))
-    assert_array_equal(
-        img_as_ubyte(data_scaled - 10), convert_to_uint8(data_scaled - 10)
-    )
+    dict1
+        dict to be compared to other dict2
+    dict2
+        dict to be compared to other dict1
 
+    Returns
+    -------
+    bool
+        Whether the two dictionaries are equal
+    """
+    if dict1.keys() != dict2.keys():
+        return False
 
-@pytest.mark.parametrize("dtype", [np.float64, np.float32, float])
-def test_float(dtype):
-    data = np.linspace(0, 0.5, 128, dtype=dtype, endpoint=False)
-    res = np.arange(128, dtype=np.uint8)
-    assert convert_to_uint8(data).dtype == np.uint8
-    assert_array_equal(convert_to_uint8(data), res)
-    data = np.linspace(0, 1, 256, dtype=dtype)
-    res = np.arange(256, dtype=np.uint8)
-    assert_array_equal(convert_to_uint8(data), res)
-    assert_array_equal(img_as_ubyte(data), convert_to_uint8(data))
-    assert_array_equal(img_as_ubyte(data - 0.5), convert_to_uint8(data - 0.5))
+    for key in dict1:
+        val1 = dict1[key]
+        val2 = dict2[key]
 
+        if isinstance(val1, np.ndarray) and isinstance(val2, np.ndarray):
+            if not np.array_equal(val1, val2):
+                return False
+        elif val1 != val2:
+            return False
 
-def test_bool():
-    data = np.zeros((10, 10), dtype=bool)
-    data[2:-2, 2:-2] = 1
-    converted = convert_to_uint8(data)
-    assert converted.dtype == np.uint8
-    assert_array_equal(img_as_ubyte(data), converted)
+    return True

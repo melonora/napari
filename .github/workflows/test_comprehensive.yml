@@ -9,6 +9,9 @@ on:
       - "v*x"
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+  pull_request:
+    paths:
+      - '.github/workflows/test_comprehensive.yml'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -25,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: "Set up Python 3.11"
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Install dependencies
@@ -72,6 +75,8 @@ jobs:
             tox_extras: "testing_extra"
         exclude:
           - python: "3.11"
+            backend: pyside2
+          - platform: windows-latest
             backend: pyside2
     with:
       python_version: ${{ matrix.python }}
