@@ -2067,7 +2067,7 @@ _turbo_data = [
     [0.47960, 0.01583, 0.01055],
 ]
 
-_hilo_data = [[0.0, 0.0, 1.0, 1.0],
+_hilo_data = [[0.0, 0.0, 0.0, 0.0],
  [0.00392156862745098, 0.00392156862745098, 0.00392156862745098, 1.0],
  [0.00784313725490196, 0.00784313725490196, 0.00784313725490196, 1.0],
  [0.011764705882352941, 0.011764705882352941, 0.011764705882352941, 1.0],
@@ -2322,7 +2322,7 @@ _hilo_data = [[0.0, 0.0, 1.0, 1.0],
  [0.9882352941176471, 0.9882352941176471, 0.9882352941176471, 1.0],
  [0.9921568627450981, 0.9921568627450981, 0.9921568627450981, 1.0],
  [0.996078431372549, 0.996078431372549, 0.996078431372549, 1.0],
- [1.0, 0.0, 0.0, 1.0]]
+ [1.0, 1.0, 1.0, 1.0]]
 
 _twilight_shifted_data = (
     _twilight_data[len(_twilight_data) // 2 :]
@@ -2344,6 +2344,13 @@ for (name, data) in (
 ):
 
     cmaps[name] = ListedColormap(data, name=name)
+    if name == "HiLo":
+        # cmaps[name]._i_under = 0
+        # cmaps[name]._i_over=65535
+        cmaps[name].set_under(color='blue', alpha=1)
+        cmaps[name].set_over(color='red', alpha=1)
+
+
     # generate reversed colormap
     name = name + '_r'
     cmaps[name] = ListedColormap(list(reversed(data)), name=name)
