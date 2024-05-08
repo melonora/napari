@@ -59,6 +59,7 @@ matplotlib_colormaps = _MATPLOTLIB_COLORMAP_NAMES = OrderedDict(
     twilight_shifted=trans._p('colormap', 'twilight shifted'),
     gist_earth=trans._p('colormap', 'gist earth'),
     PiYG=trans._p('colormap', 'PiYG'),
+    HiLo=trans._p('colormap', 'HiLo'),
 )
 _MATPLOTLIB_COLORMAP_NAMES_REVERSE = {
     v: k for k, v in matplotlib_colormaps.items()
