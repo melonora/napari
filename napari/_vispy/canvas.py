@@ -126,6 +126,7 @@ class VispyCanvas:
         ] = {}
         self._key_map_handler = key_map_handler
         self._instances.add(self)
+        self._hovered_viewbox_index = 0
 
         self.bgcolor = transform_color(
             get_theme(self.viewer.theme).canvas.as_hex()
@@ -340,8 +341,8 @@ class VispyCanvas:
             of the viewer.
         """
         nd = self.viewer.dims.ndisplay
-        # TODO: properly get position in correct subview
-        transform = self.views[0].scene.transform
+
+        transform = self.views[self._hovered_viewbox_index].scene.transform
         # cartesian to homogeneous coordinates
         mapped_position = transform.imap(list(position))
         if nd == 3:
@@ -394,6 +395,7 @@ class VispyCanvas:
         if event.pos is None:
             return
 
+        self.find_hovered_viewbox(event.pos)
         napari_event = NapariMouseEvent(
             event=event,
             view_direction=self._calculate_view_direction(event.pos),
@@ -500,6 +502,27 @@ class VispyCanvas:
         None
         """
         self._process_mouse_event(mouse_wheel_callbacks, event)
+
+    def find_hovered_viewbox(self, mouse_pos):
+        for vb_index, vb in enumerate(self.views):
+            if vb.parent:
+                rect = (
+                    vb.node_transform(self._scene_canvas.scene).map([0, 0])[
+                        :2
+                    ],
+                    vb.node_transform(self._scene_canvas.scene).map(vb.size)[
+                        :2
+                    ],
+                )
+                (x0, y0), (x1, y1) = rect
+                x_min, x_max = sorted([x0, x1])
+                y_min, y_max = sorted([y0, y1])
+                if (
+                    x_min <= mouse_pos[0] <= x_max
+                    and y_min <= mouse_pos[1] <= y_max
+                ):
+                    self._hovered_viewbox_index = vb_index
+        self._hovered_viewbox_index = 0
 
     @property
     def _canvas_corners_in_world(self) -> npt.NDArray:
