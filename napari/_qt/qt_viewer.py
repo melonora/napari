@@ -653,6 +653,7 @@ class QtViewer(QSplitter):
         # clipping in perspective projection, while still preserving enough
         # bit depth in the depth buffer to avoid artifacts. See discussion at:
         # https://github.com/napari/napari/pull/7529#issuecomment-2594203871
+        # TODO: switch to 3d mode in grid makes it so that there is no camera here.
         self.canvas.camera._3D_camera.depth_value = 128 * diameter
 
     def _add_layer(self, layer):
